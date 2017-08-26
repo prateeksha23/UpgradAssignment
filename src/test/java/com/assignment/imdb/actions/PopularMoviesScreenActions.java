@@ -68,6 +68,7 @@ public class PopularMoviesScreenActions {
 		MySqlDBConnection msc = new MySqlDBConnection();
 		msc.createConnection();
 		String name, year, rating, currentMovie = null;
+		int ranking;
 		for(int i=0;;i++){
 			String lastName = list_nameYear.get(list_nameYear.size()-1).getText();
 			if(lastName.substring(0, lastName.lastIndexOf("(")).equalsIgnoreCase(currentMovie)){
@@ -87,6 +88,15 @@ public class PopularMoviesScreenActions {
 			//get the movie name and year from the string
 			name= e.getText().substring(0, e.getText().lastIndexOf("("));
 			year = e.getText().substring(e.getText().lastIndexOf("(")+1, e.getText().lastIndexOf(")"));
+			List<WebElement> rankings = driver.findElements(By.xpath("(//android.widget.TextView[@resource-id='com.imdb.mobile:id/label'])["+(i+1)+"]//following-sibling::*[@resource-id='com.imdb.mobile:id/list_component_ranking']//*[@resource-id='com.imdb.mobile:id/ranking']"));
+			if(rankings.size()==0){
+				ranking =0;
+			}
+			else{
+				ranking = Integer.parseInt(rankings.get(0).getText());
+			}
+			
+			
 			
 			//update rating to NA is rating is not available for any movie
 			List<WebElement> ratings = driver.findElements(By.xpath("(//android.widget.TextView[@resource-id='com.imdb.mobile:id/label'])["+(i+1)+"]//following-sibling::*[@resource-id='com.imdb.mobile:id/list_component_rating']//*[@resource-id='com.imdb.mobile:id/imdb_rating']"));
@@ -99,7 +109,7 @@ public class PopularMoviesScreenActions {
 			
 			currentMovie = name;
 			//insert the movie data in row
-			msc.insertRow(name, year, rating);
+			msc.insertRow(ranking, name, year, rating);
 		}
 		msc.closeConnection();
 		Reporter.log("Inserted movies data to Database", true);
@@ -110,7 +120,7 @@ public class PopularMoviesScreenActions {
 	 */
 	public void scrollOnceUp(){
 		Dimension dimensions = driver.manage().window().getSize();
-		  Double screenHeightStart = dimensions.getHeight() * 0.70;
+		  Double screenHeightStart = dimensions.getHeight() * 0.75;
 		  int scrollStart = screenHeightStart.intValue();
 		  Double screenHeightEnd = dimensions.getHeight() * 0.1;
 		  int scrollEnd = screenHeightEnd.intValue();
@@ -174,6 +184,13 @@ public class PopularMoviesScreenActions {
 	public void clickOnBackButton(){
 		btn_back.click();
 		Reporter.log("Clicked on Back button", true);
+	}
+
+	public void printMoviesData() {
+		MySqlDBConnection msc = new MySqlDBConnection();
+		msc.createConnection();
+		msc.printMoviesData();
+		msc.closeConnection();
 	}
 	
 }

@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import org.testng.Reporter;
+
 public class MySqlDBConnection {
 	Connection con=null;
 	ResultSet rs;
@@ -17,7 +19,7 @@ public class MySqlDBConnection {
 	public void createConnection(){
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
-			con=DriverManager.getConnection( "jdbc:mysql://localhost:3306/imdb","root","admin");   
+			con=DriverManager.getConnection( "jdbc:mysql://localhost:3306/imdb?useSSL=false","root","admin");   
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -32,8 +34,8 @@ public class MySqlDBConnection {
 	 * @param year - release year of movie
 	 * @param rating - rating of movie
 	 */
-	public void insertRow(String name, String year, String rating){
-		String stmt = " INSERT INTO popularmovies (movie_name, releaseyear, rating) values (\""+name+"\",'"+year+"','"+rating+"') ON DUPLICATE KEY UPDATE releaseyear='"+year+"', rating='"+rating+"'";
+	public void insertRow(int ranking, String name, String year, String rating){
+		String stmt = " INSERT INTO popularmovies (ranking, movie_name, releaseyear, rating) values ("+ranking+",\""+name+"\",'"+year+"','"+rating+"' ) ON DUPLICATE KEY UPDATE rating='"+rating+"'";
 		
 	      try {
 	    	  PreparedStatement preparedStmt = con.prepareStatement(stmt);
@@ -73,6 +75,30 @@ public class MySqlDBConnection {
 		}  
 		
 	    return rowCount;
+	}
+
+	public void printMoviesData() {
+		String query = "SELECT * FROM popularmovies";
+		Statement st;
+		try {
+			st = con.createStatement();
+			ResultSet rs = st.executeQuery(query);
+			 while (rs.next())
+		      {
+		        int ranking = rs.getInt("ranking");
+		        String movieName = rs.getString("movie_name");
+		        String releaseDate = rs.getString("releasedate");
+		        String rating = rs.getString("rating");
+		        Reporter.log("Movie Name : "+movieName, true);
+		        Reporter.log("Movie Rating : "+rating, true);
+		        Reporter.log("Movie Release Year : "+ releaseDate, true);
+		        Reporter.log("Movie Ranking : "+ ranking, true);      
+		      }
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 
 	}
 	
 }

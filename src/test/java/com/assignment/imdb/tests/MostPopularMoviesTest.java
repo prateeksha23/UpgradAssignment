@@ -45,12 +45,17 @@ public class MostPopularMoviesTest {
 	}
 	
 	@Test(dependsOnMethods="Step05_GetAllPopularMoviesDataAndStoreInDB")
-	public void Step06_VerifyNumberOfMovies(){
+	public void Step06_PrintMoviesData(){
+		test.popularMoviesScreen.printMoviesData();
+	}
+	
+	@Test(dependsOnMethods="Step06_PrintMoviesData")
+	public void Step07_VerifyNumberOfMovies(){
 		test.popularMoviesScreen.verifyNumberOfMoviesFromDB(100);
 	}
 	
-	@Test(dependsOnMethods="Step06_VerifyNumberOfMovies")
-	public void Step07_VerifyUserIsAbleToNavigateBackToMoviesScreen(){
+	@Test(dependsOnMethods="Step07_VerifyNumberOfMovies")
+	public void Step08_VerifyUserIsAbleToNavigateBackToMoviesScreen(){
 		test.popularMoviesScreen.clickOnBackButton();
 		test.homeScreen.verifyUserIsOnMoviesScreen();
 	}
